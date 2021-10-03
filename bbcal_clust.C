@@ -1,3 +1,4 @@
+#include <TH2.h>
 #include <TH2F.h>
 #include <TChain.h>
 #include <TCanvas.h>
@@ -28,8 +29,8 @@ Int_t gCurrentEntry = -1;
 TChain *T = 0;
 Int_t foundModules = 0;
 TCanvas *canvas = 0;
-
 TCanvas *subCanv[4];
+
 
 void clicked_displayEntryButton();
 void clicked_displayNextButton();
@@ -99,16 +100,16 @@ namespace shgui {
       main->Resize();   // resize to default size
       main->MapWindow();
 
-      // for(Int_t i = 0; i < 4; i++) {
-      //   subCanv[i] = canv[i]->GetCanvas();
-      // 	// if( kNrows<12 || kNcols<12) {
-      // 	//   //subCanv[i]->Divide(kNrows,kNcols,0.001,0.001);
-      // 	//   subCanv[i]->Divide(kNcols,kNrows,0.001,0.001);
-      //   // } else {
-      // 	//   subCanv[i]->Divide(12,6,0.001,0.001);
-      //   // }
-      // 	subCanv[i]->Divide(kNcols,7,0.001,0.001);
-      // }
+      for(Int_t i = 0; i < 4; i++) {
+        subCanv[i] = canv[i]->GetCanvas();
+      	// if( kNrows<12 || kNcols<12) {
+      	//   //subCanv[i]->Divide(kNrows,kNcols,0.001,0.001);
+      	//   subCanv[i]->Divide(kNcols,kNrows,0.001,0.001);
+        // } else {
+      	//   subCanv[i]->Divide(12,6,0.001,0.001);
+        // }
+      	subCanv[i]->Divide(1,1,1,1);
+      }
     }
   }
 };
@@ -218,7 +219,7 @@ void displayEvent(Int_t entry = -1)
     }
   }
 
-  canv[0]->cd();
+  subCanv[0]->cd();
   // for(r = 0; r < kNrows; r++) {
   //   for(c = 0; c < kNcols; c++) {
       // sub = r/7;
