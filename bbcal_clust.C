@@ -99,16 +99,16 @@ namespace shgui {
       main->Resize();   // resize to default size
       main->MapWindow();
 
-      for(Int_t i = 0; i < 4; i++) {
-        subCanv[i] = canv[i]->GetCanvas();
-	// if( kNrows<12 || kNcols<12) {
-	//   //subCanv[i]->Divide(kNrows,kNcols,0.001,0.001);
-	//   subCanv[i]->Divide(kNcols,kNrows,0.001,0.001);
-        // } else {
-	//   subCanv[i]->Divide(12,6,0.001,0.001);
-        // }
-	subCanv[i]->Divide(kNcols,7,0.001,0.001);
-      }
+      // for(Int_t i = 0; i < 4; i++) {
+      //   subCanv[i] = canv[i]->GetCanvas();
+      // 	// if( kNrows<12 || kNcols<12) {
+      // 	//   //subCanv[i]->Divide(kNrows,kNcols,0.001,0.001);
+      // 	//   subCanv[i]->Divide(kNcols,kNrows,0.001,0.001);
+      //   // } else {
+      // 	//   subCanv[i]->Divide(12,6,0.001,0.001);
+      //   // }
+      // 	subCanv[i]->Divide(kNcols,7,0.001,0.001);
+      // }
     }
   }
 };
@@ -117,7 +117,7 @@ namespace shgui {
 Double_t nhit = 0;
 TH1F *histos[kNrows][kNcols];
 Bool_t gSaturated[kNrows][kNcols];
-TH1F *histos_amp[kNrows][kNcols];
+TH2F* histos_amp = new TH2F("target_amp"," Target FADC Amplitude: PS ; Ncol ; Nrow",kNcols,1,kNcols+1,kNrows,1,kNrows+1);
 
 TH1F* MakeHisto(Int_t row, Int_t col, Int_t bins, const char* suf="")
 {
@@ -191,17 +191,25 @@ void displayEvent(Int_t entry = -1)
     amp[r][c] = fadc_datat::amp[m];
     //std::cout << "n=" << fadc_datat::nsamps[m] << std::endl;
     bool displayed = false;
-    for(Int_t s = DISP_MIN_SAMPLE; s < DISP_MAX_SAMPLE && s < n; s++) {
+    // for(Int_t s = DISP_MIN_SAMPLE; s < DISP_MAX_SAMPLE && s < n; s++) {
+    //   displayed = true;
+    //   histos[r][c]->SetBinContent(s+1-DISP_MIN_SAMPLE,fadc_datat::samps[idx+s]);
+    //   //histos_amp[r][c]->SetBinContent(int(tdc[r][c]/4.0)+1,fadc_datat::amp[m]);
+    //   histos_amp[r][c]->Fill( float(c+1),float(r+1),fadc_datat::amp[m] );
+    //   if(peak[r][c]<fadc_datat::samps[idx+s])
+    //     peak[r][c]=fadc_datat::samps[idx+s];
+    //   if(peak[r][c]>4095) {
+    //     gSaturated[r][c] = true;
+    //   }
+    //   //std::cout << "setting bin content: [" << r+1 << ", " << c+1 << ", " << s << "] = " << fadc_datat::samps[idx+s] << std::endl;
+    // }
+
+    if( tdc[r][c]>0 ){
       displayed = true;
-      histos[r][c]->SetBinContent(s+1-DISP_MIN_SAMPLE,fadc_datat::samps[idx+s]);
-      histos_amp[r][c]->SetBinContent(int(tdc[r][c]/4.0)+1,fadc_datat::amp[m]);
-      if(peak[r][c]<fadc_datat::samps[idx+s])
-        peak[r][c]=fadc_datat::samps[idx+s];
-      if(peak[r][c]>4095) {
-        gSaturated[r][c] = true;
-      }
-      //std::cout << "setting bin content: [" << r+1 << ", " << c+1 << ", " << s << "] = " << fadc_datat::samps[idx+s] << std::endl;
+      histos_amp[r][c]->Fill( float(c+1),float(r+1),fadc_datat::amp[m] );
     }
+
+    
     if(!displayed) {
       std::cerr << "Skipping empty module: " << m << std::endl;
       for(Int_t s = 0;  s < DISP_FADC_SAMPLES; s++) {
@@ -210,32 +218,33 @@ void displayEvent(Int_t entry = -1)
     }
   }
 
-  for(r = 0; r < kNrows; r++) {
-    for(c = 0; c < kNcols; c++) {
-      sub = r/7;
-      //subCanv[sub]->cd(c*kNrows + r + 1);
-      subCanv[sub]->cd((r%7)*kNcols + c + 1);
-      histos[r][c]->SetTitle(TString::Format("%d-%d (ADC=%g,TDC=%g)",r+1,c+1,adc[r][c],tdc[r][c]));
-      if(gSaturated[r][c])
-        histos[r][c]->SetLineColor(kRed+1);
-      else
-        histos[r][c]->SetLineColor(kBlue+1);
-      if(tdc[r][c]!=0)
-        histos[r][c]->SetLineColor(kGreen+1);
-      TLine* L = new TLine(tdc[r][c]/4.0, 0, tdc[r][c]/4.0, peak[r][c]);
-      L->SetLineColor(kMagenta+1);
-      L->SetLineWidth(2);
-      histos_amp[r][c]->SetLineColor(kBlack);
+  canv[0]->cd();
+  // for(r = 0; r < kNrows; r++) {
+  //   for(c = 0; c < kNcols; c++) {
+      // sub = r/7;
+      // //subCanv[sub]->cd(c*kNrows + r + 1);
+      // subCanv[sub]->cd((r%7)*kNcols + c + 1);
+      // histos[r][c]->SetTitle(TString::Format("%d-%d (ADC=%g,TDC=%g)",r+1,c+1,adc[r][c],tdc[r][c]));
+      // if(gSaturated[r][c])
+      //   histos[r][c]->SetLineColor(kRed+1);
+      // else
+      //   histos[r][c]->SetLineColor(kBlue+1);
+      // if(tdc[r][c]!=0)
+      //   histos[r][c]->SetLineColor(kGreen+1);
+      // TLine* L = new TLine(tdc[r][c]/4.0, 0, tdc[r][c]/4.0, peak[r][c]);
+      // L->SetLineColor(kMagenta+1);
+      // L->SetLineWidth(2);
+      // histos_amp[r][c]->SetLineColor(kBlack);
       
-      if(histos_amp[r][c]->GetMaximum()>histos[r][c]->GetMaximum())
-	histos[r][c]->SetMaximum(histos_amp[r][c]->GetMaximum()*1.1);
-      histos[r][c]->Draw();
-      histos_amp[r][c]->Draw("same");
-      if(tdc[r][c]!=0)L->Draw("same");
-      gPad->Update();
-      std::cout << " [" << r << ", " << c << "]=" << peak[r][c];
-    }
-  }
+      // if(histos_amp[r][c]->GetMaximum()>histos[r][c]->GetMaximum())
+      // 	histos[r][c]->SetMaximum(histos_amp[r][c]->GetMaximum()*1.1);
+      // histos[r][c]->Draw();
+      histos_amp[r][c]->Draw("text colz");
+      // if(tdc[r][c]!=0)L->Draw("same");
+      // gPad->Update();
+      // std::cout << " [" << r << ", " << c << "]=" << peak[r][c];
+  //   }
+  // }
   std::cout << std::endl;
   //gSystem->mkdir("images/",kTRUE);
   //std::cerr << "Saving canvas!" << std::endl;
@@ -277,15 +286,15 @@ Int_t display(Int_t run = 290, Int_t event = -1)
     //T->SetBranchAddress("bb.sh.ledcount",&fadc_datat::ledcount);
     T->SetBranchAddress("bb.sh.samps",fadc_datat::samps);
     T->SetBranchAddress("bb.sh.samps_idx",fadc_datat::samps_idx);
-    T->SetBranchAddress("bb.sh.row",fadc_datat::row);
-    T->SetBranchAddress("bb.sh.col",fadc_datat::col);
-    T->SetBranchStatus("Ndata.bb.sh.row",1);
-    T->SetBranchAddress("Ndata.bb.sh.row",&fadc_datat::ndata);
+    T->SetBranchAddress("bb.sh.adcrow",fadc_datat::row);
+    T->SetBranchAddress("bb.sh.adccol",fadc_datat::col);
+    T->SetBranchStatus("Ndata.bb.sh.adcrow",1);
+    T->SetBranchAddress("Ndata.bb.sh.adcrow",&fadc_datat::ndata);
     std::cerr << "Opened up tree with nentries=" << T->GetEntries() << std::endl;
     for(Int_t r = 0; r < kNrows; r++) {
       for(Int_t c = 0; c < kNcols; c++) {
         histos[r][c] = MakeHisto(r,c,DISP_FADC_SAMPLES);
-        histos_amp[r][c] = MakeHisto(r,c,DISP_FADC_SAMPLES,"_amp");
+        //histos_amp[r][c] = MakeHisto(r,c,DISP_FADC_SAMPLES,"_amp");
         gSaturated[r][c] = false;
       }
     }
