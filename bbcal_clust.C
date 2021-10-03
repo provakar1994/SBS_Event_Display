@@ -275,7 +275,9 @@ Int_t display(Int_t run = 290, Int_t event = -1)
 
   if(!T) { 
     T = new TChain("T");
-    T->Add(TString::Format("/home/bbshower/sbs_devel/ReplayedFiles/bbshower_%d_10000.root",run));
+    TString dataDIR = gSystem->Getenv("OUT_DIR");
+    TString filename = dataDIR + "/bbshower_"+run+"_30000.root";
+    // T->Add(TString::Format("/home/bbshower/sbs_devel/ReplayedFiles/bbshower_%d_10000.root",run));
     T->SetBranchStatus("*",0);
     T->SetBranchStatus("bb.sh.*",1);
     T->SetBranchAddress("bb.sh.nsamps",fadc_datat::nsamps);
