@@ -8,7 +8,8 @@
 #include "fadc_data.h"
 
 const Int_t kNrows = 27;
-const Int_t kNcols = 7;
+const
+Int_t kNcols = 7;
 
 const Int_t kNumModules = kNrows*kNcols;
 const Int_t DISP_MIN_SAMPLE = 85*0;
@@ -207,7 +208,7 @@ void displayEvent(Int_t entry = -1)
 
     if( tdc[r][c]>0 ){
       displayed = true;
-      histos_amp[r][c]->Fill( float(c+1),float(r+1),fadc_datat::amp[m] );
+      histos_amp->Fill( double(c+1),double(r+1),fadc_datat::amp[m] );
     }
 
     
@@ -240,7 +241,7 @@ void displayEvent(Int_t entry = -1)
       // if(histos_amp[r][c]->GetMaximum()>histos[r][c]->GetMaximum())
       // 	histos[r][c]->SetMaximum(histos_amp[r][c]->GetMaximum()*1.1);
       // histos[r][c]->Draw();
-      histos_amp[r][c]->Draw("text colz");
+      histos_amp->Draw("text colz");
       // if(tdc[r][c]!=0)L->Draw("same");
       // gPad->Update();
       // std::cout << " [" << r << ", " << c << "]=" << peak[r][c];
