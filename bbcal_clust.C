@@ -192,7 +192,7 @@ void displayEvent(Int_t entry = -1)
     tdc[r][c] = fadc_datat::tdc[m];
     amp[r][c] = fadc_datat::amp[m];
     //std::cout << "n=" << fadc_datat::nsamps[m] << std::endl;
-    bool displayed = false;
+    //bool displayed = false;
     // for(Int_t s = DISP_MIN_SAMPLE; s < DISP_MAX_SAMPLE && s < n; s++) {
     //   displayed = true;
     //   histos[r][c]->SetBinContent(s+1-DISP_MIN_SAMPLE,fadc_datat::samps[idx+s]);
@@ -206,18 +206,18 @@ void displayEvent(Int_t entry = -1)
     //   //std::cout << "setting bin content: [" << r+1 << ", " << c+1 << ", " << s << "] = " << fadc_datat::samps[idx+s] << std::endl;
     // }
 
-    if( tdc[r][c]>0 ){
-      displayed = true;
+    //if( tdc[r][c]>0 ){
+    //displayed = true;
       histos_amp->Fill( double(c+1),double(r+1),fadc_datat::amp[m] );
-    }
+      //}
 
     
-    if(!displayed) {
-      std::cerr << "Skipping empty module: " << m << std::endl;
-      for(Int_t s = 0;  s < DISP_FADC_SAMPLES; s++) {
-        histos[r][c]->SetBinContent(s+1,-404);
-      }
-    }
+    // if(!displayed) {
+    //   std::cerr << "Skipping empty module: " << m << std::endl;
+    //   for(Int_t s = 0;  s < DISP_FADC_SAMPLES; s++) {
+    //     histos[r][c]->SetBinContent(s+1,-404);
+    //   }
+    // }
   }
 
   subCanv[0]->cd();
@@ -275,26 +275,46 @@ Int_t display(Int_t run = 290, Int_t event = -1)
   gStyle->SetLabelSize(0.05,"XY");
   gStyle->SetTitleFontSize(0.08);
 
+  // if(!T) { 
+  //   T = new TChain("T");
+  //   TString dataDIR = gSystem->Getenv("OUT_DIR");
+  //   TString filename = dataDIR + "/bbshower_"+run+"_500000.root";
+  //   cout << filename << endl;
+  //   // T->Add(TString::Format("/home/bbshower/sbs_devel/ReplayedFiles/bbshower_%d_10000.root",run));
+  //   T->SetBranchStatus("*",0);
+  //   T->SetBranchStatus("bb.sh.*",1);
+  //   T->SetBranchAddress("bb.sh.nsamps",fadc_datat::nsamps);
+  //   T->SetBranchAddress("bb.sh.a",fadc_datat::a);
+  //   T->SetBranchAddress("bb.sh.a_time",fadc_datat::tdc);
+  //   T->SetBranchAddress("bb.sh.a_amp_p",fadc_datat::amp);
+  //   //T->SetBranchAddress("bb.sh.ledbit",&fadc_datat::ledbit);
+  //   //T->SetBranchAddress("bb.sh.ledcount",&fadc_datat::ledcount);
+  //   T->SetBranchAddress("bb.sh.samps",fadc_datat::samps);
+  //   T->SetBranchAddress("bb.sh.samps_idx",fadc_datat::samps_idx);
+  //   T->SetBranchAddress("bb.sh.adcrow",fadc_datat::row);
+  //   T->SetBranchAddress("bb.sh.adccol",fadc_datat::col);
+  //   T->SetBranchStatus("Ndata.bb.sh.adcrow",1);
+  //   T->SetBranchAddress("Ndata.bb.sh.adcrow",&fadc_datat::ndata);
+  //   std::cerr << "Opened up tree with nentries=" << T->GetEntries() << std::endl;
   if(!T) { 
     T = new TChain("T");
     TString dataDIR = gSystem->Getenv("OUT_DIR");
-    TString filename = dataDIR + "/bbshower_"+run+"_30000.root";
-    // T->Add(TString::Format("/home/bbshower/sbs_devel/ReplayedFiles/bbshower_%d_10000.root",run));
+    TString filename = dataDIR + "/bbshower_"+run+"_500000.root";
+    event = -1;
+    T->Add(filename);
     T->SetBranchStatus("*",0);
     T->SetBranchStatus("bb.sh.*",1);
-    T->SetBranchAddress("bb.sh.nsamps",fadc_datat::nsamps);
-    T->SetBranchAddress("bb.sh.a",fadc_datat::a);
-    T->SetBranchAddress("bb.sh.a_time",fadc_datat::tdc);
+    T->SetBranchAddress("bb.sh.a_p",fadc_datat::a);
     T->SetBranchAddress("bb.sh.a_amp_p",fadc_datat::amp);
-    //T->SetBranchAddress("bb.sh.ledbit",&fadc_datat::ledbit);
-    //T->SetBranchAddress("bb.sh.ledcount",&fadc_datat::ledcount);
-    T->SetBranchAddress("bb.sh.samps",fadc_datat::samps);
-    T->SetBranchAddress("bb.sh.samps_idx",fadc_datat::samps_idx);
+    T->SetBranchAddress("bb.sh.a_time",fadc_datat::tdc);
     T->SetBranchAddress("bb.sh.adcrow",fadc_datat::row);
     T->SetBranchAddress("bb.sh.adccol",fadc_datat::col);
     T->SetBranchStatus("Ndata.bb.sh.adcrow",1);
     T->SetBranchAddress("Ndata.bb.sh.adcrow",&fadc_datat::ndata);
-    std::cerr << "Opened up tree with nentries=" << T->GetEntries() << std::endl;
+    // T->SetBranchAddress("bb.sh.nsamps",fadc_datat::nsamps);
+    // T->SetBranchAddress("bb.sh.samps",fadc_datat::samps);
+    // T->SetBranchAddress("bb.sh.samps_idx",fadc_datat::samps_idx);    
+    cout << "Opened up tree with nentries=" << T->GetEntries() << endl;
     for(Int_t r = 0; r < kNrows; r++) {
       for(Int_t c = 0; c < kNcols; c++) {
         histos[r][c] = MakeHisto(r,c,DISP_FADC_SAMPLES);
