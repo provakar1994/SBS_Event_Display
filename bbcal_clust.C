@@ -183,7 +183,7 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
 
     if( tdc[r][c]>0 ){
       //displayed = true;
-      hSH_amp->Fill( double(c+1),double(r+1),fadc_datat::amp[m] );
+      hSH_amp->Fill( double(c+1),double(r+1),fadc_datat::a[m] );
     }
 
   }
@@ -202,7 +202,7 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
     ampPS[r][c] = fadc_datat::ampPS[m];
     
     if( tdcPS[r][c]>0 ){
-      hPS_amp->Fill( double(c),double(r+1),fadc_datat::ampPS[m] );
+      hPS_amp->Fill( double(c),double(r+1),fadc_datat::aPS[m] );
     }
   }
     
@@ -249,9 +249,9 @@ Int_t display(Int_t run = 290, Int_t event = -1)
   gStyle->SetTitleFontSize(0.08);
   if(!T) { 
     T = new TChain("T");
-    //TString dataDIR = gSystem->Getenv("OUT_DIR");
-    //TString filename = dataDIR + "/bbshower_"+run+"_500000.root";
-    TString filename = "../bbshower_434_30000.root";
+    TString dataDIR = gSystem->Getenv("OUT_DIR");
+    TString filename = dataDIR + "/bbshower_"+run+"_500000.root";
+    // TString filename = "../bbshower_434_30000.root";
     event = -1;
     T->Add(filename);
     T->SetBranchStatus("*",0);
