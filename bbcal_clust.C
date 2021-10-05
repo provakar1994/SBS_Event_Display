@@ -107,8 +107,10 @@ namespace shgui {
 
 Double_t nhit = 0;
 TH1F *histos[kNrows][kNcols];
-TH2F* hSH_amp = new TH2F("sh_amp","Shower ; Ncol ; Nrow",kNcols,1,kNcols+1,kNrows,1,kNrows+1);
-TH2F* hPS_amp = new TH2F("ps_amp","PreShower ; Ncol ; Nrow",kNcolsPS,1,kNcolsPS+1,kNrowsPS,1,kNrowsPS+1);
+TH2F* hSH_int = new TH2F("sh_int","Shower ; Ncol ; Nrow",kNcols,1,kNcols+1,kNrows,1,kNrows+1);
+TH2F* hSH_clus_e = new TH2F("sh_clus_e","Shower ; Ncol ; Nrow",kNcols,1,kNcols+1,kNrows,1,kNrows+1);
+TH2F* hPS_int = new TH2F("ps_int","PreShower ; Ncol ; Nrow",kNcolsPS,1,kNcolsPS+1,kNrowsPS,1,kNrowsPS+1);
+TH2F* hPS_clus_e = new TH2F("ps_clus_e","PreShower ; Ncol ; Nrow",kNcolsPS,1,kNcolsPS+1,kNrowsPS,1,kNrowsPS+1);
 
 // TH1F* MakeHisto(Int_t row, Int_t col, Int_t bins, const char* suf="")
 // {
@@ -148,13 +150,20 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
 
   Int_t r,c,idx,n,sub;
   // Clear old histograms, just in case modules are not in the tree
-  hSH_amp->Reset("ICES M");
-  hPS_amp->Reset("ICES M");
+  hSH_int->Reset("ICES M");
+  hPS_int->Reset("ICES M");
+  //Clustering
+  hSH_clus_e->Reset("ICES M");
+  hPS_clus_e->Reset("ICES M");
 
   Float_t amp[kNrows][kNcols], ampPS[kNrowsPS][kNcolsPS];
   Float_t peak[kNrows][kNcols];
   Double_t adc[kNrows][kNcols], adcPS[kNrowsPS][kNcolsPS];
   Double_t tdc[kNrows][kNcols], tdcPS[kNrowsPS][kNcolsPS];
+  //CLustering
+  Double_t clus_e_SH[kNrows][kNcols];
+  Double_t clus_e_PS[kNrows][kNcols];
+  
   for(r  = 0; r < kNrows; r++) {
     for(c  = 0; c < kNcols; c++) {
       peak[r][c] = 0.0;
@@ -164,6 +173,9 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
       adcPS[r][c] = 0.0;
       ampPS[r][c] = 0.0;
       tdcPS[r][c] = 0.0;
+      //Clustering
+      clus_e_SH[r][c] = 0.0;
+      clus_e_PS[r][c] = 0.0;
     }
   }
   for(Int_t m = 0; m < fadc_datat::ndata; m++) {
@@ -181,9 +193,13 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
     tdc[r][c] = fadc_datat::tdc[m];
     amp[r][c] = fadc_datat::amp[m];
 
+    //Clustering
+    clus_e_SH[r][c] = fadc_datat::cl_e_SH[m];
+
     if( tdc[r][c]>0 ){
       //displayed = true;
-      hSH_amp->Fill( double(c+1),double(r+1),fadc_datat::a[m] );
+      hSH_int->Fill( double(c+1),double(r+1),fadc_datat::a[m] );
+      hSH_clus_e->Fill( double(c+1),double(r+1),fadc_datat::cl_e_PS[m] );
     }
 
   }
@@ -200,31 +216,56 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
     adcPS[r][c] = fadc_datat::aPS[m];
     tdcPS[r][c] = fadc_datat::tdcPS[m];
     ampPS[r][c] = fadc_datat::ampPS[m];
+
+    //Clustering
+    clus_e_PS[r][c] = fadc_datat::cl_e_PS[m];
     
     if( tdcPS[r][c]>0 ){
-      hPS_amp->Fill( double(c),double(r+1),fadc_datat::aPS[m] );
+      hPS_int->Fill( double(c),double(r+1),fadc_datat::aPS[m] );
+      hPS_clus_e->Fill( double(c),double(r+1),fadc_datat::cl_e_PS[m] );
     }
   }
     
   subCanv[0]->cd(1);
   gPad->SetGridx();
   gPad->SetGridy();
-  hSH_amp->SetStats(0);
-  hSH_amp->SetMaximum(50);
-  hSH_amp->SetMinimum(0); 
-  hSH_amp->GetYaxis()->SetNdivisions(kNrows);
-  hSH_amp->GetXaxis()->SetNdivisions(kNcols);
-  hSH_amp->Draw("text colz");
+  hSH_int->SetStats(0);
+  hSH_int->SetMaximum(50);
+  hSH_int->SetMinimum(0); 
+  hSH_int->GetYaxis()->SetNdivisions(kNrows);
+  hSH_int->GetXaxis()->SetNdivisions(kNcols);
+  hSH_int->Draw("text colz");
   gPad->Update();
   subCanv[0]->cd(2);
   gPad->SetGridx();
   gPad->SetGridy();
-  hPS_amp->SetStats(0);
-  hPS_amp->SetMaximum(50);
-  hPS_amp->SetMinimum(0); 
-  hPS_amp->GetYaxis()->SetNdivisions(kNrowsPS);
-  hPS_amp->GetXaxis()->SetNdivisions(kNcolsPS);
-  hPS_amp->Draw("text colz");
+  hPS_int->SetStats(0);
+  hPS_int->SetMaximum(50);
+  hPS_int->SetMinimum(0); 
+  hPS_int->GetYaxis()->SetNdivisions(kNrowsPS);
+  hPS_int->GetXaxis()->SetNdivisions(kNcolsPS);
+  hPS_int->Draw("text colz");
+  gPad->Update();
+
+  subCanv[1]->cd(1);
+  gPad->SetGridx();
+  gPad->SetGridy();
+  hSH_clus_e->SetStats(0);
+  hSH_clus_e->SetMaximum(50);
+  hSH_clus_e->SetMinimum(0); 
+  hSH_clus_e->GetYaxis()->SetNdivisions(kNrows);
+  hSH_clus_e->GetXaxis()->SetNdivisions(kNcols);
+  hSH_clus_e->Draw("text colz");
+  gPad->Update();
+  subCanv[1]->cd(2);
+  gPad->SetGridx();
+  gPad->SetGridy();
+  hPS_clus_e->SetStats(0);
+  hPS_clus_e->SetMaximum(50);
+  hPS_clus_e->SetMinimum(0); 
+  hPS_clus_e->GetYaxis()->SetNdivisions(kNrowsPS);
+  hPS_clus_e->GetXaxis()->SetNdivisions(kNcolsPS);
+  hPS_clus_e->Draw("text colz");
   gPad->Update();
 }
 
@@ -271,6 +312,9 @@ Int_t display(Int_t run = 290, Int_t event = -1)
     T->SetBranchAddress("bb.ps.adccol",fadc_datat::colPS);
     T->SetBranchStatus("Ndata.bb.ps.adcrow",1);
     T->SetBranchAddress("Ndata.bb.ps.adcrow",&fadc_datat::ndataPS);
+    // Clustering
+    T->SetBranchAddress("bb.sh.clus.e_c",fadc_datat::cl_e_SH);
+    T->SetBranchAddress("bb.sh.clus.e_c",fadc_datat::cl_e_PS);
     cout << "Opened up tree with nentries=" << T->GetEntries() << endl;
   }
   return 0;

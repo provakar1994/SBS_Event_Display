@@ -13,8 +13,6 @@ namespace fadc_datat {
   Double_t samps_idx[MAX_FADC_DATA_MODULES+1000] = {0};
   Double_t a[MAX_FADC_DATA_MODULES+1000] = {0};
   Int_t ndata = 0;
-  Double_t ledbit = -1;
-  Double_t ledcount = 0;
   Double_t tdc[MAX_FADC_DATA_TDC_MODULES+100];
   Double_t amp[MAX_FADC_DATA_MODULES+100];
   Double_t rowPS[MAX_FADC_DATA_MODULES+1000] = {0};
@@ -23,6 +21,10 @@ namespace fadc_datat {
   Int_t ndataPS = 0;
   Double_t tdcPS[MAX_FADC_DATA_TDC_MODULES+100];
   Double_t ampPS[MAX_FADC_DATA_MODULES+100];
+
+  // Clustering
+  Double_t cl_e_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_e_PS[MAX_FADC_DATA_MODULES+1000] = {0};
 };
 
 void fixStats()
