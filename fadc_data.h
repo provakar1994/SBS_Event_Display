@@ -23,8 +23,29 @@ namespace fadc_datat {
   Double_t ampPS[MAX_FADC_DATA_MODULES+100];
 
   // Clustering
+  Int_t cl_ndata_SH = 0;
   Double_t cl_e_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_e_c_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_x_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_y_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_row_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_col_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_id_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_nblk_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_eblk_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_eblk_c_SH[MAX_FADC_DATA_MODULES+1000] = {0};
+
+  Int_t cl_ndata_PS = 0;
   Double_t cl_e_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_e_c_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_x_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_y_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_row_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_col_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_id_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_nblk_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_eblk_PS[MAX_FADC_DATA_MODULES+1000] = {0};
+  Double_t cl_eblk_c_PS[MAX_FADC_DATA_MODULES+1000] = {0};
 };
 
 void fixStats()
