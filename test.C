@@ -160,20 +160,35 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
     if( T->bb_sh_a_time[m]>0 ){
      hSH_int->Fill( double(c+1),double(r+1), T->bb_sh_a_p[m] );     
     }
-  }
+  
 
   // SH Clustering
-  double clusID = T->bb_sh_clus_id[0];
-  for(Int_t mCl = 0; mCl < T->bb_sh_clus_; mCl++) {
-    rCl = fadc_datat::cl_row_SH[mCl];
-    cCl = fadc_datat::cl_col_SH[mCl];
+  // double clusID = T->bb_sh_clus_id[0];
+  // for(Int_t mCl = 0; mCl < T->bb_sh_clus_; mCl++) {
+  //   rCl = fadc_datat::cl_row_SH[mCl];
+  //   cCl = fadc_datat::cl_col_SH[mCl];
  
-    //cout << " I am here SH cluster " << endl;
+  //   //cout << " I am here SH cluster " << endl;
 
-    clus_e_SH[mCl] = fadc_datat::cl_e_SH[mCl]; 
-    //if( fadc_datat::tdc[mCl]>0. ){
-      hSH_clus_e->Fill( double(cCl+1),double(rCl+1),clus_e_SH[mCl] ); 
-      //}
+  //   clus_e_SH[mCl] = fadc_datat::cl_e_SH[mCl]; 
+  //   //if( fadc_datat::tdc[mCl]>0. ){
+  //     hSH_clus_e->Fill( double(cCl+1),double(rCl+1),clus_e_SH[mCl] ); 
+  //     //}
+  // }
+
+    hSH_clus_e->Fill( double(c+1),double(r+1), 0.5 );
+  
+    int cid = T->bb_sh_clus_id[0];
+
+    for( int b = 0; b < T->bb_sh_clus_nblk[0]; b++ ){
+      int cblkid = T->bb_sh_clus_blk_id[m];
+      //if( el = hcalt::cblkid[b] ) blk_clus[r][c]=1.0;
+      if( m == cblkid ) 
+	hSH_clus_e->Fill( double(c+1),double(r+1), 1.0 );
+    
+      if( m == cid )
+	hSH_clus_e->Fill( double(c+1),double(r+1), 1.0 );
+    }
   }
 
   // // Pre-Shower
@@ -269,7 +284,7 @@ Int_t display(Int_t run = 290, Int_t event = -1)
   gStyle->SetLabelSize(0.05,"XY");
   gStyle->SetTitleFontSize(0.08);
 
-  TString filename = "../bbshower_434_30000.root";
+  TString filename = "$OUT_DIR/bbshower_434_30000.root";
   TFile *f = TFile::Open(filename); 
   TChain *C = (TChain*)f->Get("T");
   cout << "Opened up tree with nentries=" << C->GetEntries() << endl;
