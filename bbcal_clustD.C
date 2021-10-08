@@ -6,7 +6,7 @@
 #include <iostream>
 #include <TSystem.h>
 #include "fadc_data.h"
-#include "bbshower.C"
+#include "gmn_tree.C"
 
 const Int_t kNrows = 27;
 const Int_t kNcols = 7;
@@ -17,7 +17,7 @@ const Int_t kCanvSize = 100;
 std::string user_input;
 Int_t gCurrentEntry = -1;
 
-bbshower *T;
+gmn_tree *T;
 Int_t foundModules = 0;
 TCanvas *canvas = 0;
 TCanvas *subCanv[4];
@@ -157,7 +157,7 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
       continue;
 
     if( T->bb_sh_a_time[m]>0 ){
-     hSH_int->Fill( double(c+1),double(r+1), T->bb_sh_a_c[m] );     
+     hSH_int->Fill( double(c+1),double(r+1), T->bb_sh_a_p[m] );     
     } 
 
     // SH Clustering
@@ -166,7 +166,6 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
 
     for( int b = 0; b < T->bb_sh_clus_nblk[0]; b++ ){
       int cblkid = T->bb_sh_clus_blk_id[b];
-      //if( el = hcalt::cblkid[b] ) blk_clus[r][c]=1.0;
       if( m == cblkid ) 
 	hSH_clus_e->Fill( double(c+1),double(r+1), 0.5 );
     
@@ -187,21 +186,20 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
       continue;
 
     if( T->bb_ps_a_time[m]>0 ){
-     hPS_int->Fill( double(c+1),double(r+1), T->bb_ps_a_c[m] );     
+     hPS_int->Fill( double(c),double(r+1), T->bb_ps_a_p[m] );     
     }
 
     // PS Clustering
-    hPS_clus_e->Fill( double(c+1),double(r+1), 0. );
+    hPS_clus_e->Fill( double(c),double(r+1), 0. );
     int cid = T->bb_ps_clus_id[0];
 
     for( int b = 0; b < T->bb_ps_clus_nblk[0]; b++ ){
       int cblkid = T->bb_ps_clus_blk_id[b];
-      //if( el = hcalt::cblkid[b] ) blk_clus[r][c]=1.0;
       if( m == cblkid ) 
-	hPS_clus_e->Fill( double(c+1),double(r+1), 0.5 );
+	hPS_clus_e->Fill( double(c),double(r+1), 0.5 );
     
       if( m == cid )
-	hPS_clus_e->Fill( double(c+1),double(r+1), 1.0 );
+	hPS_clus_e->Fill( double(c),double(r+1), 1.0 );
     }
 
   }
@@ -270,6 +268,7 @@ Int_t display(Int_t run = 290, Int_t event = -1)
   gStyle->SetTitleFontSize(0.08);
 
   TString filename = "../bbshower_434_30000.root";
+  //TString filename = From("$OUT_DIR/bbshower_%d_50000.root",run);
   TFile *f = TFile::Open(filename); 
   TChain *C = (TChain*)f->Get("T");
   cout << "Opened up tree with nentries=" << C->GetEntries() << endl;
