@@ -267,13 +267,13 @@ Int_t display(Int_t run = 290, Int_t event = -1)
   gStyle->SetLabelSize(0.05,"XY");
   gStyle->SetTitleFontSize(0.08);
 
-  TString filename = "../bbshower_434_30000.root";
-  //TString filename = From("$OUT_DIR/bbshower_%d_50000.root",run);
+  //TString filename = "../bbshower_434_30000.root";
+  TString filename = From("$OUT_DIR/bbshower_%d_50000.root",run);
   TFile *f = TFile::Open(filename); 
   TChain *C = (TChain*)f->Get("T");
   cout << "Opened up tree with nentries=" << C->GetEntries() << endl;
 
-  T = new bbshower(C);
+  T = new gmn_tree(C);
   event = -1;
 
   gCurrentEntry = event;
