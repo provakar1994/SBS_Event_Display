@@ -172,11 +172,11 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
     cout << "Clus ID " << T->bb_sh_clus_id[cl] << "\t" << "Clus e_c= " << T->bb_sh_clus_e_c[cl];
     cout << "\tNo. of blocks involved= " << T->bb_sh_clus_nblk[cl] << endl;
     int cID = (int)T->bb_sh_clus_id[cl];
-    if( cID!=-1 ){
+    if( cID!=-1 ){ // Only choosing the cluster which passed threshold
       int rCl = (int)T->bb_sh_adcrow[cID];
       int cCl = (int)T->bb_sh_adccol[cID];
       hSH_clus_e->Fill( double(cCl+1), double(rCl+1), T->bb_sh_clus_e_c[cl] );
-      if( cl==0 ){
+      if( cl==0 ){ // Block level info is only stored for main cluster i.e. cl=0.
 	for( int b = 0; b < (int)T->bb_sh_clus_nblk[cl]; b++ ){
 	  int cblkID = (int)T->bb_sh_clus_blk_id[b];
 	  int rblkCl = (int)T->bb_sh_adcrow[cblkID];
