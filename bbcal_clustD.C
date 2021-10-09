@@ -134,6 +134,7 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
   }
 
   T->GetEntry(gCurrentEntry);
+  cout << endl;
   std::cout << "Displaying event " << gCurrentEntry << std::endl;
   shgui::ledLabel->SetText(TString::Format("Run #: %d",run));
 
@@ -163,22 +164,35 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
      hSH_int->Fill( double(c+1),double(r+1), T->bb_sh_a_p[m] );
      hSH_intEng->Fill( double(c+1),double(r+1), T->bb_sh_a_c[m] );     
     } 
-
-    // SH Clustering
-    hSH_clus_e->Fill( double(c+1),double(r+1), 0. );
-    int cid = T->bb_sh_clus_id[0];
-
-    for( int b = 0; b < T->bb_sh_clus_nblk[0]; b++ ){
-      int cblkid = T->bb_sh_clus_blk_id[b];
-      if( m == cblkid ) 
-	hSH_clus_e->Fill( double(c+1),double(r+1), 0.5 );
-    
-      if( m == cid )
-	hSH_clus_e->Fill( double(c+1),double(r+1), 1.0 );
-    }
   }
+  
+  // SH Clustering
+  cout << "Number of SH clusters in this event= " << T->bb_sh_nclus << endl;
+  for( int cl=0; cl<(int)T->bb_sh_nclus; cl++ ){
+    cout << "Clus ID " << T->bb_sh_clus_id[cl] << "\t" << "Clus e_c= " << T->bb_sh_clus_e_c[cl];
+    cout << "\tNo. of blocks involved= " << T->bb_sh_clus_nblk[cl] << endl;
+    int cID = (int)T->bb_sh_clus_id[cl];
+    if( cID!=-1 ){
+      int rCl = (int)T->bb_sh_adcrow[cID];
+      int cCl = (int)T->bb_sh_adccol[cID];
+      hSH_clus_e->Fill( double(cCl+1), double(rCl+1), T->bb_sh_clus_e_c[cl] );
+      if( cl==0 ){
+	for( int b = 0; b < (int)T->bb_sh_clus_nblk[cl]; b++ ){
+	  int cblkID = (int)T->bb_sh_clus_blk_id[b];
+	  int rblkCl = (int)T->bb_sh_adcrow[cblkID];
+	  int cblkCl = (int)T->bb_sh_adccol[cblkID];
+	  if(cblkID!=cID){
+	    cout << "Clus Blk ID " << T->bb_sh_clus_blk_id[b] << "\t" << "Clus Blk e_c= " << T->bb_sh_a_c[cblkID] << endl; 
+	    hSH_clus_e->Fill( double(cblkCl+1), double(rblkCl+1), T->bb_sh_a_c[cblkID] );
+	  }
+	}
+      }
+    }
+  }//
 
-  // // Pre-Shower
+  cout << endl;
+  
+  // Pre-Shower
   for(Int_t m = 0; m < T->Ndata_bb_ps_adcrow; m++) {
     r = T->bb_ps_adcrow[m];
     c = T->bb_ps_adccol[m];
@@ -193,21 +207,32 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
      hPS_int->Fill( double(c),double(r+1), T->bb_ps_a_p[m] ); 
      hPS_intEng->Fill( double(c),double(r+1), T->bb_ps_a_c[m] );     
     }
-
-    // PS Clustering
-    hPS_clus_e->Fill( double(c),double(r+1), 0. );
-    int cid = T->bb_ps_clus_id[0];
-
-    for( int b = 0; b < T->bb_ps_clus_nblk[0]; b++ ){
-      int cblkid = T->bb_ps_clus_blk_id[b];
-      if( m == cblkid ) 
-	hPS_clus_e->Fill( double(c),double(r+1), 0.5 );
-    
-      if( m == cid )
-	hPS_clus_e->Fill( double(c),double(r+1), 1.0 );
-    }
-
   }
+
+  // PS Clustering
+  cout << "Number of PS clusters in this event= " << T->bb_ps_nclus << endl;
+  for( int cl=0; cl<(int)T->bb_ps_nclus; cl++ ){
+    cout << "Clus ID " << T->bb_ps_clus_id[cl] << "\t" << "Clus e_c= " << T->bb_ps_clus_e_c[cl];
+    cout << "\tNo. of blocks involved= " << T->bb_ps_clus_nblk[cl] << endl;
+    int cID = (int)T->bb_ps_clus_id[cl];
+    if( cID!=-1 ){
+      int rCl = (int)T->bb_ps_adcrow[cID];
+      int cCl = (int)T->bb_ps_adccol[cID];
+      hPS_clus_e->Fill( double(cCl+1), double(rCl+1), T->bb_ps_clus_e_c[cl] );
+      if( cl==0 ){
+	for( int b = 0; b < (int)T->bb_ps_clus_nblk[cl]; b++ ){
+	  int cblkID = (int)T->bb_ps_clus_blk_id[b];
+	  int rblkCl = (int)T->bb_ps_adcrow[cblkID];
+	  int cblkCl = (int)T->bb_ps_adccol[cblkID];
+	  if(cblkID!=cID){
+	    cout << "Clus Blk ID " << T->bb_ps_clus_blk_id[b] << "\t" << "Clus Blk e_c= " << T->bb_ps_a_c[cblkID] << endl; 
+	    hPS_clus_e->Fill( double(cblkCl+1), double(rblkCl+1), T->bb_ps_a_c[cblkID] );
+	  }
+	}
+      }
+    }
+  }
+  
   
   subCanv[0]->cd(1);
   gPad->SetGridx();
@@ -238,7 +263,7 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
   hSH_clus_e->SetMinimum(0); 
   hSH_clus_e->GetYaxis()->SetNdivisions(kNrows);
   hSH_clus_e->GetXaxis()->SetNdivisions(kNcols);
-  hSH_clus_e->Draw("colz");
+  hSH_clus_e->Draw("text colz");
   gPad->Update();
   subCanv[1]->cd(2);
   gPad->SetGridx();
@@ -248,7 +273,7 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
   hPS_clus_e->SetMinimum(0); 
   hPS_clus_e->GetYaxis()->SetNdivisions(kNrowsPS);
   hPS_clus_e->GetXaxis()->SetNdivisions(kNcolsPS);
-  hPS_clus_e->Draw("colz");
+  hPS_clus_e->Draw("text colz");
   gPad->Update();
 
   subCanv[2]->cd(1);
@@ -269,7 +294,7 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
   hSH_clus_e->SetMinimum(0); 
   hSH_clus_e->GetYaxis()->SetNdivisions(kNrows);
   hSH_clus_e->GetXaxis()->SetNdivisions(kNcols);
-  hSH_clus_e->Draw("colz");
+  hSH_clus_e->Draw("text colz");
   gPad->Update();
 
   subCanv[3]->cd(1);
@@ -290,9 +315,8 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
   hPS_clus_e->SetMinimum(0); 
   hPS_clus_e->GetYaxis()->SetNdivisions(kNrowsPS);
   hPS_clus_e->GetXaxis()->SetNdivisions(kNcolsPS);
-  hPS_clus_e->Draw("colz");
+  hPS_clus_e->Draw("text colz");
   gPad->Update();
-
 }
 
 void clicked_displayNextButton()
@@ -315,8 +339,8 @@ Int_t display(Int_t run = 290, Int_t event = 50000)
   gStyle->SetLabelSize(0.05,"XY");
   gStyle->SetTitleFontSize(0.08);
 
-  //TString filename = "../bbshower_434_30000.root";
-  TString filename = Form("$OUT_DIR/bbshower_%d_%d.root",run,event);
+  TString filename = "../bbshower_434_5000.root";
+  //TString filename = Form("$OUT_DIR/bbshower_%d_%d.root",run,event);
   TFile *f = TFile::Open(filename); 
   TChain *C = (TChain*)f->Get("T");
   cout << "Opened up tree with nentries=" << C->GetEntries() << endl;
