@@ -110,9 +110,9 @@ TH1F *histos[kNrows][kNcols];
 TH2F* hSH_int = new TH2F("sh_int","Shower(a_p) ; Ncol ; Nrow",kNcols,1,kNcols+1,kNrows,1,kNrows+1);
 TH2F* hSH_intEng = new TH2F("sh_intE","Shower(a_c) ; Ncol ; Nrow",kNcols,1,kNcols+1,kNrows,1,kNrows+1);
 TH2F* hSH_clus_e = new TH2F("sh_clus_e","Shower(Cluster) ; Ncol ; Nrow",kNcols,1,kNcols+1,kNrows,1,kNrows+1);
-TH2F* hPS_int = new TH2F("ps_int","PreShower(a_p) ; Ncol ; Nrow",kNcolsPS,1,kNcolsPS+1,kNrowsPS,1,kNrowsPS+1);
-TH2F* hPS_intEng = new TH2F("ps_intE","PreShower(a_c) ; Ncol ; Nrow",kNcolsPS,1,kNcolsPS+1,kNrowsPS,1,kNrowsPS+1);
-TH2F* hPS_clus_e = new TH2F("ps_clus_e","PreShower(Cluster) ; Ncol ; Nrow",kNcolsPS,1,kNcolsPS+1,kNrowsPS,1,kNrowsPS+1);
+TH2F* hPS_int = new TH2F("ps_int","PreShower(a_p) ; Ncol ; Nrow",kNcolsPS,0,kNcolsPS,kNrowsPS,1,kNrowsPS+1);
+TH2F* hPS_intEng = new TH2F("ps_intE","PreShower(a_c) ; Ncol ; Nrow",kNcolsPS,0,kNcolsPS,kNrowsPS,1,kNrowsPS+1);
+TH2F* hPS_clus_e = new TH2F("ps_clus_e","PreShower(Cluster) ; Ncol ; Nrow",kNcolsPS,0,kNcolsPS,kNrowsPS,1,kNrowsPS+1);
 
 bool is_number(const std::string& mystring)
 {
@@ -168,23 +168,26 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
   
   // SH Clustering
   cout << "Number of SH clusters in this event= " << T->bb_sh_nclus << endl;
+  //cout << "Clus xpos= " << T->bb_sh_x << " ypos= " << T->bb_sh_y << endl;
+  cout << "HE blkID (idblk) = " << T->bb_sh_idblk << "  " << "HE blk Row,Col (rowblk+1,colblk+1)= " << T->bb_sh_rowblk+1 << "," << T->bb_sh_colblk+1 << endl;
+  //cout << "HE Blk e_c= " << T->bb_sh_eblk_c << "  " << "HE Blk xpos,ypos= " << T->bb_sh_x << "," << T->bb_sh_y << endl;
   for( int cl=0; cl<(int)T->bb_sh_nclus; cl++ ){
-    cout << "Clus ID " << T->bb_sh_clus_id[cl] << "\t" << "Clus e_c= " << T->bb_sh_clus_e_c[cl];
-    cout << "\tNo. of blocks involved= " << T->bb_sh_clus_nblk[cl] << endl;
+    //cout << "Clus ID " << T->bb_sh_clus_id[cl] << "  " << "Clus e_c= " << T->bb_sh_clus_e_c[cl];
+    //cout << "  No. of blocks= " << T->bb_sh_clus_nblk[cl] << endl;
     int cID = (int)T->bb_sh_clus_id[cl];
     if( cID!=-1 ){ // Only choosing the cluster which passed threshold
-      int rCl = (int)T->bb_sh_adcrow[cID];
-      int cCl = (int)T->bb_sh_adccol[cID];
+      int rCl = (int)T->bb_sh_clus_row[cl];
+      int cCl = (int)T->bb_sh_clus_col[cl];
       hSH_clus_e->Fill( double(cCl+1), double(rCl+1), T->bb_sh_clus_e_c[cl] );
       if( cl==0 ){ // Block level info is only stored for main cluster i.e. cl=0.
 	for( int b = 0; b < (int)T->bb_sh_clus_nblk[cl]; b++ ){
 	  int cblkID = (int)T->bb_sh_clus_blk_id[b];
-	  int rblkCl = (int)T->bb_sh_adcrow[cblkID];
-	  int cblkCl = (int)T->bb_sh_adccol[cblkID];
-	  if(cblkID!=cID){
-	    cout << "Clus Blk ID " << T->bb_sh_clus_blk_id[b] << "\t" << "Clus Blk e_c= " << T->bb_sh_a_c[cblkID] << endl; 
+	  int rblkCl = (int)T->bb_sh_clus_blk_row[b];
+	  int cblkCl = (int)T->bb_sh_clus_blk_col[b];
+	  //if(cblkID!=cID){
+	  //cout << "Clus Blk ID " << T->bb_sh_clus_blk_id[b] << "\t" << "Clus Blk e_c= " << T->bb_sh_a_c[cblkID] << endl; 
 	    hSH_clus_e->Fill( double(cblkCl+1), double(rblkCl+1), T->bb_sh_a_c[cblkID] );
-	  }
+	    //}
 	}
       }
     }
@@ -211,22 +214,26 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
 
   // PS Clustering
   cout << "Number of PS clusters in this event= " << T->bb_ps_nclus << endl;
+  //cout << "Clus xpos= " << T->bb_ps_x << " ypos= " << T->bb_ps_y << endl;
+  cout << "HE blkID (idblk) = " << T->bb_ps_idblk << "  " << "HE blk Row,Col (rowblk+1,colblk)= " << T->bb_ps_rowblk+1 << "," << T->bb_ps_colblk << endl;
+  //cout << "HE Blk e_c= " << T->bb_ps_eblk_c << "  " << "HE Blk xpos,ypos= " << T->bb_ps_x << "," << T->bb_ps_y << endl;  
   for( int cl=0; cl<(int)T->bb_ps_nclus; cl++ ){
-    cout << "Clus ID " << T->bb_ps_clus_id[cl] << "\t" << "Clus e_c= " << T->bb_ps_clus_e_c[cl];
-    cout << "\tNo. of blocks involved= " << T->bb_ps_clus_nblk[cl] << endl;
+    //cout << "Clus ID " << T->bb_ps_clus_id[cl] << "\t" << "Clus e_c= " << T->bb_ps_clus_e_c[cl];
+    //cout << "\tNo. of blocks involved= " << T->bb_ps_clus_nblk[cl] << endl;
+    //cout << "Clus xpos= " << T->bb_ps_x << " ypos= " << T->bb_ps_y << endl;
     int cID = (int)T->bb_ps_clus_id[cl];
     if( cID!=-1 ){
       int rCl = (int)T->bb_ps_adcrow[cID];
       int cCl = (int)T->bb_ps_adccol[cID];
-      hPS_clus_e->Fill( double(cCl+1), double(rCl+1), T->bb_ps_clus_e_c[cl] );
+      hPS_clus_e->Fill( double(cCl), double(rCl+1), T->bb_ps_clus_e_c[cl] );
       if( cl==0 ){
 	for( int b = 0; b < (int)T->bb_ps_clus_nblk[cl]; b++ ){
 	  int cblkID = (int)T->bb_ps_clus_blk_id[b];
 	  int rblkCl = (int)T->bb_ps_adcrow[cblkID];
 	  int cblkCl = (int)T->bb_ps_adccol[cblkID];
 	  if(cblkID!=cID){
-	    cout << "Clus Blk ID " << T->bb_ps_clus_blk_id[b] << "\t" << "Clus Blk e_c= " << T->bb_ps_a_c[cblkID] << endl; 
-	    hPS_clus_e->Fill( double(cblkCl+1), double(rblkCl+1), T->bb_ps_a_c[cblkID] );
+	    //cout << "Clus Blk ID " << T->bb_ps_clus_blk_id[b] << "\t" << "Clus Blk e_c= " << T->bb_ps_a_c[cblkID] << endl; 
+	    hPS_clus_e->Fill( double(cblkCl), double(rblkCl+1), T->bb_ps_a_c[cblkID] );
 	  }
 	}
       }
