@@ -276,28 +276,37 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
     }
   }
   
+  // Cluster position with search radius (Drawing circle)
+  double xClposSH = T->bb_sh_x;
+  double yClposSH = T->bb_sh_y;
+  TEllipse *ClposSH = new TEllipse(yClposSH,xClposSH,.15,.15);
+  ClposSH->SetFillStyle(0);
+  ClposSH->SetLineWidth(1);
+  ClposSH->SetLineColor(kBlack);
+  TEllipse *dotClSH = new TEllipse(yClposSH,xClposSH,.008,.008);
+  dotClSH->SetFillStyle(1001);
+  dotClSH->SetFillColor(1);
+
   // Tracking stuff (Drawing circle)
-  // double xTrATsh = T->BB_gold_x + zposSH*T->BB_gold_th;
-  // double yTrATsh = T->BB_gold_y + zposSH*T->BB_gold_ph;
   double xTrATsh = T->bb_tr_x[0] + zposSH*T->bb_tr_th[0];
   double yTrATsh = T->bb_tr_y[0] + zposSH*T->bb_tr_ph[0];
-  TEllipse *trackPOSatSH = new TEllipse(yTrATsh,xTrATsh,.05,.07);
+  TEllipse *trackPOSatSH = new TEllipse(yTrATsh,xTrATsh,.05,.05);
   trackPOSatSH->SetFillStyle(0);
   trackPOSatSH->SetLineWidth(2);
   trackPOSatSH->SetLineColor(kRed);
   TEllipse *dotSH = new TEllipse(yTrATsh,xTrATsh,.008,.008);
   dotSH->SetFillStyle(1001);
-  dotSH->SetFillColor(1);
+  dotSH->SetFillColor(2);
 
   double xTrATps = T->bb_tr_x[0] + zposPS*T->bb_tr_th[0];
   double yTrATps = T->bb_tr_y[0] + zposPS*T->bb_tr_ph[0];
-  TEllipse *trackPOSatPS = new TEllipse(yTrATps,xTrATps,.05,.07);
+  TEllipse *trackPOSatPS = new TEllipse(yTrATps,xTrATps,.05,.05);
   trackPOSatPS->SetFillStyle(0);
   trackPOSatPS->SetLineWidth(2);
   trackPOSatPS->SetLineColor(kRed);
   TEllipse *dotPS = new TEllipse(yTrATps,xTrATps,.008,.008);
   dotPS->SetFillStyle(1001);
-  dotPS->SetFillColor(1);
+  dotPS->SetFillColor(2);
   
   subCanv[0]->cd(1);
   gPad->SetGridx();
@@ -310,6 +319,8 @@ void displayEvent(Int_t entry = -1, Int_t run = 7 )
   hSH_xypos->Draw("text colz");
   dotSH->Draw("same");
   trackPOSatSH->Draw("same");
+  dotClSH->Draw("same");
+  ClposSH->Draw("same");
   gPad->Update();
   subCanv[0]->cd(2);
   gPad->SetGridx();
